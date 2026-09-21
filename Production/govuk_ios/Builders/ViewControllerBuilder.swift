@@ -540,21 +540,7 @@ class ViewControllerBuilder {
             completionAction: completionAction
         )
         let containerView = InfoView<ChatConsentOnboardingViewModel>(
-            viewModel: viewModel,
-            customView: {
-                AnyView(InfoIconListView(
-                    list: [
-                        InfoIconListItem(
-                            text: String.chat.localized("onboardingConsentFirstListItemText"),
-                            iconName: "info.circle"
-                        ),
-                        InfoIconListItem(
-                            text: String.chat.localized("onboardingConsentSecondListItemText"),
-                            iconName: "filemenu.and.cursorarrow"
-                        )
-                    ]
-                ))
-            }
+            viewModel: viewModel
         )
         let viewController = HostingViewController(
             rootView: containerView,
@@ -770,23 +756,6 @@ class ViewControllerBuilder {
         return viewController
     }
 
-    func dvlaAccount(
-        dvlaService: DVLAServiceInterface,
-        viewType: DVLAAccountViewType
-    ) -> UIViewController {
-        let viewModel = DVLAAccountViewModel(
-            dvlaService: dvlaService,
-            viewType: viewType
-        )
-        let view = DVLAAccountView(
-            viewModel: viewModel
-        )
-        let viewController = HostingViewController(
-            rootView: view
-        )
-        return viewController
-    }
-
     func vehicleDetail(
         analyticsService: AnalyticsServiceInterface,
         dvlaService: DVLAServiceInterface,
@@ -895,14 +864,13 @@ class ViewControllerBuilder {
     func countryList(
         travelService: TravelServiceInterface,
         analyticsService: AnalyticsServiceInterface,
+        notificationService: NotificationServiceInterface,
         dismissAction: @escaping () -> Void
     ) -> UIViewController {
         let viewModel = CountryListViewModel(
             travelService: travelService,
             analyticsService: analyticsService,
-            countrySelectedAction: { _ in
-                // To be applied in upcoming work
-            },
+            notificationService: notificationService,
             dismissAction: dismissAction
         )
         let view = CountryListView(viewModel: viewModel)

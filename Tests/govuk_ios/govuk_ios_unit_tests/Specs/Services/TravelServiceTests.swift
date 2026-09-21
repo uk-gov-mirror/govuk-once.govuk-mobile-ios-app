@@ -91,7 +91,17 @@ struct TravelServiceTests {
         #expect(mockTravelRepository._clearCalled)
     }
 
+    @Test
+    func invalidateGroups_clearGroupsCache() {
+        sut.invalidateGroups()
+        #expect(mockTravelRepository._invalidateGroupsCalled)
+    }
 
+    @Test
+    func invalidateCountries_clearCountriesCache() {
+        sut.invalidateCountries()
+        #expect(mockTravelRepository._invalidateCountriesCalled)
+    }
 
     @Test
     func getCountries_clientReturnsCountries_returnsValues() async throws {
@@ -105,9 +115,56 @@ struct TravelServiceTests {
                 ._receivedFetchCountriesCompletion?(.success(Self.remoteCountries))
         }
 
-        let groups = try #require(try? result.get())
-        #expect(groups == Self.remoteCountries)
-        #expect(mockTravelServiceClient._fetchCountriesCallCount == 0)
+        let countries = try #require(try? result.get())
+        #expect(countries == Self.remoteCountries)
+        #expect(mockTravelServiceClient._fetchCountriesCallCount == 1)
+        #expect(mockTravelRepository._storedCountries == Self.remoteCountries)
+    }
+
+    @Test
+    func subscribeToGroups_success_callsClient() async throws {
+        let slug = "travel-group-1"
+
+        let result = await withCheckedContinuation { continuation in
+            sut.subscribeToGroups(slug: slug) { result in
+                continuation.resume(returning: result)
+            }
+            mockTravelServiceClient._receivedSubscribeCompletion?(.success(()))
+        }
+
+        #expect(result.getError() == nil)
+        #expect(mockTravelServiceClient._subscribeToGroupsCallCount == 1)
+        #expect(mockTravelServiceClient._receivedSubscribeSlug == slug)
+    }
+
+    @Test
+    func subscribeToGroups_success_invalidatesGroupsCache() async throws {
+        let slug = "travel-group-1"
+
+        let result = await withCheckedContinuation { continuation in
+            sut.subscribeToGroups(slug: slug) { result in
+                continuation.resume(returning: result)
+            }
+            mockTravelServiceClient._receivedSubscribeCompletion?(.success(()))
+        }
+
+        _ = try #require(try? result.get())
+        #expect(mockTravelRepository._invalidateGroupsCalled)
+    }
+
+    @Test
+    func subscribeToGroups_failure_doesNotInvalidateCache() async {
+        let slug = "travel-group-1"
+
+        let result = await withCheckedContinuation { continuation in
+            sut.subscribeToGroups(slug: slug) { result in
+                continuation.resume(returning: result)
+            }
+            mockTravelServiceClient._receivedSubscribeCompletion?(.failure(.apiUnavailable))
+        }
+
+        #expect(result.getError() == .apiUnavailable)
+        #expect(mockTravelRepository._invalidateGroupsCalled == false)
     }
 
 }
@@ -122,13 +179,14 @@ private extension TravelServiceTests {
     ]
 
     static let cachedCountries: [Country] = [
-        Country(country: "United Kingdom", slug: "united-kingdom", lastUpdate: "2024-01-01", synonyms: ["UK"]),
-        Country(country: "France", slug: "france", lastUpdate: "2024-01-01", synonyms: [])
+        Country(name: "France", slug: "france", rawLastUpdate: "2024-01-01T00:00:00Z", synonyms: []),
+        Country(name: "Germany", slug: "germany", rawLastUpdate: "2024-01-01T00:00:00Z", synonyms: []),
+        Country(name: "Spain", slug: "spain", rawLastUpdate: "2024-01-01T00:00:00Z", synonyms: [])
     ]
 
     static let remoteCountries: [Country] = [
-        Country(country: "France", slug: "france", lastUpdate: "", synonyms: []),
-        Country(country: "Germany", slug: "germany", lastUpdate: "", synonyms: []),
-        Country(country: "Spain", slug: "spain", lastUpdate: "", synonyms: [])
+        Country(name: "France", slug: "france", rawLastUpdate: "2024-01-01T00:00:00Z", synonyms: []),
+        Country(name: "Germany", slug: "germany", rawLastUpdate: "2024-01-01T00:00:00Z", synonyms: []),
+        Country(name: "Spain", slug: "spain", rawLastUpdate: "2024-01-01T00:00:00Z", synonyms: [])
     ]
 }

@@ -39,7 +39,12 @@ struct ServiceAccountLinkSuccessView: View {
 
     private var imageView: some View {
         Image(systemName: "checkmark.circle.fill")
+<<<<<<< HEAD
             .resizable().scaledToFit()
+=======
+            .resizable()
+            .scaledToFit()
+>>>>>>> main
             .frame(width: 95, height: 95)
             .foregroundStyle(Color(UIColor.govUK.text.header))
             .accessibilityHidden(true)

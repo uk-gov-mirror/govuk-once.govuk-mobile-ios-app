@@ -4,6 +4,9 @@ import GovKit
 protocol TravelServiceInterface {
     func getGroups(forceRefresh: Bool, completion: @escaping TravelGroupResultCompletion)
     func getCountries(forceRefresh: Bool, completion: @escaping CountriesListResultCompletion)
+    func subscribeToGroups(slug: String, completion: @escaping SubscriptionResultCompletion)
+    func invalidateGroups()
+    func invalidateCountries()
     func invalidateCache()
 }
 
@@ -48,14 +51,49 @@ class TravelService: TravelServiceInterface {
         forceRefresh: Bool = false,
         completion: @escaping CountriesListResultCompletion
     ) {
-        // Implement caching and real API handling
+        if forceRefresh == false,
+           let cachedCountriesList = repository.fetchCountries() {
+            completion(.success(cachedCountriesList))
+            return
+        }
 
-        completion(.success([
-            Country(country: "France", slug: "france", lastUpdate: "", synonyms: []),
-            Country(country: "Germany", slug: "germany", lastUpdate: "", synonyms: []),
-            Country(country: "Spain", slug: "spain", lastUpdate: "", synonyms: [])
-        ]))
-        return
+        travelServiceClient.fetchCountries(
+            completion: { result in
+                switch result {
+                case .success(let countries):
+                    self.repository.store(countries: countries)
+                    completion(.success(countries))
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            }
+        )
+    }
+
+    func subscribeToGroups(
+        slug: String,
+        completion: @escaping SubscriptionResultCompletion
+    ) {
+        travelServiceClient.subscribeToGroups(
+            slug: slug,
+            completion: { result in
+                switch result {
+                case .success:
+                    self.invalidateGroups()
+                    completion(.success(()))
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            }
+        )
+    }
+
+    func invalidateGroups() {
+        repository.invalidateGroups()
+    }
+
+    func invalidateCountries() {
+        repository.invalidateCountries()
     }
 
     func invalidateCache() {

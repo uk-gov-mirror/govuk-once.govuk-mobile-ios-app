@@ -34,7 +34,12 @@ struct ChatOptInView: View {
         VStack {
             if verticalSizeClass != .compact {
                 Image(decorative: "chat_onboarding_info")
+<<<<<<< HEAD
                     .resizable().scaledToFit()
+=======
+                    .resizable()
+                    .scaledToFit()
+>>>>>>> main
                     .padding(.bottom, 16)
                     .frame(width: 140, height: 140)
                     .accessibilityHidden(true)

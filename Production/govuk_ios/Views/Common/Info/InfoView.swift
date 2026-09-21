@@ -159,7 +159,12 @@ struct InfoView<Model>: View where Model: InfoViewModelInterface {
                 animationName: animationName,
                 shouldReduceMotion: true,
                 playbackMode: LottieLoopMode.playOnce
+<<<<<<< HEAD
             ).scaledToFit()
+=======
+            )
+            .scaledToFit()
+>>>>>>> main
             .frame(maxHeight: 252)
         case .none:
             EmptyView()
