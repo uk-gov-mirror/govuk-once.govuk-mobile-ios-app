@@ -760,7 +760,6 @@ class SettingsViewModelTests {
         await MainActor.run {
             sut.loadMessages()
         }
-        
         await Task.init(priority: .userInitiated) { @MainActor in }.value
 
         await MainActor.run {
@@ -789,15 +788,11 @@ class SettingsViewModelTests {
             userService: MockUserService(),
             notificationCentreService: MockNotificationCentreService()
         )
-
         let hasMessagesRow = localSut.listContent.contains { section in
             section.rows.contains { $0.id == "settings.messages.row" }
         }
-        
         #expect(!hasMessagesRow, "The Messages row should be hidden when the messages feature flag is false.")
     }
-
-
 
     @Test
     func accountLinked_messagesShown() async {
@@ -838,7 +833,6 @@ class SettingsViewModelTests {
         let messagesSection = result.listContent.first(where: { section in
             section.rows.first(where: { $0.id == "settings.messages.row"}) != nil
         })
-
         #expect(messagesSection != nil)
     }
     
