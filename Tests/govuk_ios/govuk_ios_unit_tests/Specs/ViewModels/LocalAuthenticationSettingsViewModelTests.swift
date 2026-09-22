@@ -102,7 +102,6 @@ struct LocalAuthenticationSettingsViewModelTests {
     @Test
     @MainActor
     func faceIdButtonAction_noStoredRefreshToken_evaluateError_setsShowSettingsAlert() async throws {
-        // Arrange
         let mockAuthService = MockAuthenticationService()
         let mockLocalAuthService = MockLocalAuthenticationService()
         let mockAnalyticsService = MockAnalyticsService()

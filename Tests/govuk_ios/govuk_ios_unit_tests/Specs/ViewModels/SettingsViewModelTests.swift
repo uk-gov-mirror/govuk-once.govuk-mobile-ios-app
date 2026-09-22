@@ -753,7 +753,7 @@ class SettingsViewModelTests {
                 localAuthenticationService: MockLocalAuthenticationService(),
                 appConfigService: mockAppConfigService,
                 userService: mockUserService,
-                notificationCentreService: mockNotificationCentreService // Inject the safely configured mock
+                notificationCentreService: mockNotificationCentreService
             )
         }
 
@@ -772,10 +772,9 @@ class SettingsViewModelTests {
         }
     }
 
-    // Adapt for when flag is false
     @Test
     func messagesFeatureDisabled_hidesMessagesRow() {
-        self.mockAppConfigService.features = [.profile, .dvla] // No .messages here!
+        self.mockAppConfigService.features = [.profile, .dvla]
 
         let localSut = SettingsViewModel(
             analyticsService: self.mockAnalyticsService,
@@ -787,7 +786,7 @@ class SettingsViewModelTests {
             notificationCenter: NotificationCenter(),
             localAuthenticationService: self.mockLocalAuthenticationService,
             appConfigService: self.mockAppConfigService,
-            userService: MockUserService(), // Pure placeholder mock, no stubbing required
+            userService: MockUserService(),
             notificationCentreService: MockNotificationCentreService()
         )
 
@@ -845,7 +844,6 @@ class SettingsViewModelTests {
     
     @Test
     func accountsNotLoaded_fetchesLinkedAccounts() async throws {
-        // 1. Arrange
         let mockUserService = MockUserService()
         mockUserService._stubbedLinkedAccounts = nil
         mockUserService._stubbedFetchLinkedAccountsResult = .success([.dvla])
